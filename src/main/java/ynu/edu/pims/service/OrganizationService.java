@@ -1,7 +1,6 @@
 package ynu.edu.pims.service;
 
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.EventListener;
@@ -9,8 +8,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import ynu.edu.pims.entity.Account;
 import ynu.edu.pims.entity.Organization;
+import ynu.edu.pims.entity.Registration;
 import ynu.edu.pims.repository.AccountRepository;
 import ynu.edu.pims.repository.OrganizationRepository;
+import ynu.edu.pims.repository.RegistrationRepository;
 
 @Service
 @DependsOn("accountService")
@@ -22,12 +23,14 @@ public class OrganizationService {
     @Resource
     private AccountRepository accountRepository;
 
+    @Resource
+    private RegistrationRepository registrationRepository;
+
     /**
      * 应用启动后初始化组织（Order=3 确保在账户初始化之后执行）
      */
     @EventListener(ApplicationReadyEvent.class)
     @Order(3)
-    @Transactional
     public void initOrganization() {
         if (organizationRepository.count() == 0) {
             createOrganization(2L, "Apple ML", "Apple ML is a machine learning company.",
@@ -46,6 +49,7 @@ public class OrganizationService {
         Account admin = accountRepository.findById(adminId).orElse(null);
         if (admin == null) return;
 
+        // 创建组织
         Organization org = new Organization();
         org.setName(name);
         org.setDescription(description);
@@ -56,8 +60,11 @@ public class OrganizationService {
         org.setAccount(admin);
         organizationRepository.save(org);
 
-        // 创建者加入组织
-        admin.getOrganizations().add(org);
-        accountRepository.save(admin);
+        // 创建者加入组织（通过 Registration 表）
+        Registration registration = new Registration();
+        registration.setAccount(admin);
+        registration.setOrganization(org);
+        registration.setState(1);  // 创建者直接通过
+        registrationRepository.save(registration);
     }
 }

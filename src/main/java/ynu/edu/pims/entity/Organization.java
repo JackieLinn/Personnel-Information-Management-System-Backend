@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Data
 @Table(name = "organization")
@@ -40,10 +37,4 @@ public class Organization implements BaseData {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Account account;
-
-    // 组织成员（通过 registration 表关联）
-    @ManyToMany(mappedBy = "organizations")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Account> members = new HashSet<>();
 }
