@@ -12,12 +12,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ynu.edu.pims.dto.request.ConfirmResetRO;
-import ynu.edu.pims.dto.request.EmailRegisterRO;
-import ynu.edu.pims.dto.request.EmailResetRO;
+import ynu.edu.pims.dto.request.*;
 import ynu.edu.pims.entity.Account;
+import ynu.edu.pims.entity.Organization;
+import ynu.edu.pims.entity.Registration;
 import ynu.edu.pims.entity.Role;
 import ynu.edu.pims.repository.AccountRepository;
+import ynu.edu.pims.repository.OrganizationRepository;
+import ynu.edu.pims.repository.RegistrationRepository;
 import ynu.edu.pims.repository.RoleRepository;
 import ynu.edu.pims.utils.Const;
 import ynu.edu.pims.utils.FlowUtils;
@@ -48,6 +50,135 @@ public class AccountService implements UserDetailsService {
 
     @Resource
     private RoleRepository roleRepository;
+
+    @Resource
+    private OrganizationRepository organizationRepository;
+
+    @Resource
+    private RegistrationRepository registrationRepository;
+
+    /**
+     * 用户修改个人信息
+     *
+     * @param ro 包含用户修改信息的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String modifyAccountInformation(AccountResetRO ro) {
+        // 检查用户是否存在
+        Optional<Account> accountOpt = accountRepository.findById(ro.getId());
+        if (accountOpt.isEmpty()) {
+            return "用户不存在";
+        }
+        // 检查手机号是否被其他用户使用
+        if (accountRepository.existsByPhoneAndIdNot(ro.getPhone(), ro.getId())) {
+            return "该手机号已被其他用户使用";
+        }
+        Account account = ro.asViewObject(Account.class, acc -> {
+            Account original = accountOpt.get();
+            acc.setPassword(original.getPassword());
+            acc.setEmail(original.getEmail());
+            acc.setPosition(original.getPosition());
+            acc.setRoles(original.getRoles());
+        });
+        accountRepository.save(account);
+        return null;
+    }
+
+    /**
+     * 老板修改组织内员工的职位信息
+     *
+     * @param ro 包含组织id、操作者id、员工id和新职位的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String modifyAccountPosition(PositionResetRO ro) {
+        // 检查操作者是否是该组织的创建者（老板）
+        if (!organizationRepository.existsByIdAndAccountId(ro.getOid(), ro.getBossId())) {
+            return "您不是该组织的管理员，无权修改";
+        }
+        // 检查被修改员工是否在该组织中（已通过审核）
+        if (!registrationRepository.existsByAccountIdAndOrganizationIdAndState(ro.getEmployeeId(), ro.getOid(), 1)) {
+            return "该员工不在您的组织中";
+        }
+        // 修改员工职位
+        Optional<Account> accountOpt = accountRepository.findById(ro.getEmployeeId());
+        if (accountOpt.isEmpty()) {
+            return "员工不存在";
+        }
+        Account employee = accountOpt.get();
+        employee.setPosition(ro.getPosition());
+        accountRepository.save(employee);
+        return null;
+    }
+
+    /**
+     * 老板添加用户并加入组织
+     *
+     * @param ro 包含组织id、老板id和用户信息的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String addAccountInOrganization(AccountRO ro) {
+        // 检查操作者是否是该组织的创建者（老板）
+        if (!organizationRepository.existsByIdAndAccountId(ro.getOid(), ro.getBossId())) {
+            return "您不是该组织的管理员，无权添加用户";
+        }
+        // 检查邮箱是否已存在
+        if (accountRepository.existsByEmail(ro.getEmail())) {
+            return "该邮箱已被注册";
+        }
+        // 检查手机号是否已存在
+        if (accountRepository.existsByPhone(ro.getPhone())) {
+            return "该手机号已被注册";
+        }
+        // 创建用户
+        Account account = ro.asViewObject(Account.class, acc -> {
+            acc.setPassword(encoder.encode("123456"));
+            acc.setAvatar("https://avatars.githubusercontent.com/u/181219839?v=4");
+            acc.setAddress("China");
+        });
+        // 分配 user 角色
+        roleRepository.findByRolename("user").ifPresent(role -> account.getRoles().add(role));
+        accountRepository.save(account);
+        // 加入组织
+        Organization org = organizationRepository.findById(ro.getOid()).orElse(null);
+        if (org != null) {
+            Registration registration = new Registration();
+            registration.setAccount(account);
+            registration.setOrganization(org);
+            registration.setState(1);
+            registrationRepository.save(registration);
+        }
+        return null;
+    }
+
+    /**
+     * 老板将用户移出组织
+     *
+     * @param ro 包含组织id、老板id和用户id的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String addAccountOutOrganization(OutRO ro) {
+        // 检查操作者是否是该组织的老板
+        if (!organizationRepository.existsByIdAndAccountId(ro.getOid(), ro.getBossId())) {
+            return "您不是该组织的管理员，无权操作";
+        }
+        // 查找 registration 记录
+        Optional<Registration> regOpt = registrationRepository.findByAccountIdAndOrganizationId(ro.getAid(), ro.getOid());
+        if (regOpt.isEmpty()) {
+            return "该用户不在组织中";
+        }
+        // 修改 registration 状态为 3（删除）
+        Registration registration = regOpt.get();
+        registration.setState(3);
+        registrationRepository.save(registration);
+        // 修改用户 position 为 null
+        Optional<Account> accountOpt = accountRepository.findById(ro.getAid());
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            account.setPosition(null);
+            accountRepository.save(account);
+        }
+        return null;
+    }
 
     /**
      * 应用启动后初始化超级管理员账户（Order=2 确保在角色初始化之后执行）

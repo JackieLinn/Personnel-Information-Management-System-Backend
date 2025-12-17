@@ -6,4 +6,6 @@ import ynu.edu.pims.entity.Organization;
 
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
+    
+    boolean existsByIdAndAccountId(Long oid, Long aid);
 }

@@ -26,5 +26,5 @@ public class Registration implements BaseData {
     private Organization organization;
 
     @Column(nullable = false, name = "state")
-    private Integer state;  // 0: 待审核; 1: 通过; 2: 拒绝
+    private Integer state;  // 0: 待审核; 1: 通过; 2: 拒绝; 3: 删除
 }
