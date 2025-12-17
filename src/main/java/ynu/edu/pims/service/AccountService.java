@@ -56,20 +56,33 @@ public class AccountService implements UserDetailsService {
     @Order(2)
     public void initAccount() {
         if (accountRepository.count() == 0) {
-            Account superAdmin = new Account();
-            superAdmin.setUsername("superadmin");
-            superAdmin.setPassword(encoder.encode("123456"));
-            superAdmin.setEmail("123456@qq.com");
-            superAdmin.setSex(0);
-            superAdmin.setPhone("13888888888");
-            superAdmin.setPosition("admin");
-            superAdmin.setAddress("中国大陆");
-            superAdmin.setBirthday(LocalDate.of(1900, 1, 1));
-            superAdmin.setAvatar("https://avatars.githubusercontent.com/u/136216354?s=400&u=e6ec94f374b9c070a0119045c89c88df141edcf1&v=4");
-            // 关联 superadmin 角色
-            roleRepository.findByRolename("superadmin").ifPresent(role -> superAdmin.getRoles().add(role));
-            accountRepository.save(superAdmin);
+            createAccount("superadmin", "123456@qq.com", "13888888888", "superadmin",
+                    LocalDate.of(1900, 1, 1), "https://avatars.githubusercontent.com/u/136216354?s=96&v=4", "superadmin");
+            createAccount("JackieLinn", "23456@qq.com", "13111111111", "boss",
+                    LocalDate.of(2004, 1, 1), "https://avatars.githubusercontent.com/u/136216354?s=96&v=4", "admin");
+            createAccount("KrowFeather", "345678@qq.com", "13222222222", "boss",
+                    LocalDate.of(2004, 2, 2), "https://avatars.githubusercontent.com/u/38802245?v=4", "admin");
+            createAccount("01-Dreamer", "456789@qq.com", "13333333333", "boss",
+                    LocalDate.of(2005, 1, 1), "https://avatars.githubusercontent.com/u/148927117?v=4", "admin");
+            createAccount("test1", "1234567@qq.com", "13444444444", "user",
+                    LocalDate.of(1995, 1, 1), "https://avatars.githubusercontent.com/u/181219839?v=4", "user");
         }
+    }
+
+    private void createAccount(String username, String email, String phone, String position,
+                               LocalDate birthday, String avatar, String roleName) {
+        Account account = new Account();
+        account.setUsername(username);
+        account.setPassword(encoder.encode("123456"));
+        account.setEmail(email);
+        account.setSex(0);
+        account.setPhone(phone);
+        account.setPosition(position);
+        account.setAddress("China");
+        account.setBirthday(birthday);
+        account.setAvatar(avatar);
+        roleRepository.findByRolename(roleName).ifPresent(role -> account.getRoles().add(role));
+        accountRepository.save(account);
     }
 
     /**

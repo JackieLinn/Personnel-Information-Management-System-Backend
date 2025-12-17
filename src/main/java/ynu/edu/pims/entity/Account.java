@@ -24,7 +24,7 @@ public class Account implements BaseData {
     private String password;
 
     @Column(nullable = false, name = "sex")
-    private Integer sex;
+    private Integer sex;    // 0: 男; 1: 女
 
     @Column(nullable = false, name = "birthday")
     private LocalDate birthday;
@@ -53,4 +53,14 @@ public class Account implements BaseData {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "registration",
+            joinColumns = @JoinColumn(name = "aid"),
+            inverseJoinColumns = @JoinColumn(name = "oid")
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Organization> organizations = new HashSet<>();
 }
