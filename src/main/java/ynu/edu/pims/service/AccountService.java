@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ynu.edu.pims.dto.request.*;
+import ynu.edu.pims.dto.response.AccountVO;
 import ynu.edu.pims.entity.Account;
 import ynu.edu.pims.entity.Organization;
 import ynu.edu.pims.entity.Registration;
@@ -25,6 +26,7 @@ import ynu.edu.pims.utils.Const;
 import ynu.edu.pims.utils.FlowUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -169,6 +171,68 @@ public class AccountService implements UserDetailsService {
         registration.setPosition("OUT");
         registrationRepository.save(registration);
         return null;
+    }
+
+    /**
+     * 获取组织内所有已通过的成员
+     *
+     * @param oid 组织id
+     * @return 成员列表
+     */
+    public List<AccountVO> getAllAccounts(Long oid) {
+        return registrationRepository.findByOrganizationIdAndState(oid, 1).stream()
+                .map(this::toAccountVO)
+                .toList();
+    }
+
+    /**
+     * 根据用户名模糊搜索组织内成员
+     *
+     * @param oid      组织id
+     * @param username 用户名关键字
+     * @return 匹配的成员列表
+     */
+    public List<AccountVO> getAccountsByUsername(Long oid, String username) {
+        return registrationRepository.findByOrganizationIdAndStateAndAccountUsernameContaining(oid, 1, username).stream()
+                .map(this::toAccountVO)
+                .toList();
+    }
+
+    /**
+     * 根据职位模糊搜索组织内成员
+     *
+     * @param oid      组织id
+     * @param position 职位关键字
+     * @return 匹配的成员列表
+     */
+    public List<AccountVO> getAccountsByPosition(Long oid, String position) {
+        return registrationRepository.findByOrganizationIdAndStateAndPositionContaining(oid, 1, position).stream()
+                .map(this::toAccountVO)
+                .toList();
+    }
+
+    /**
+     * 根据用户名和职位模糊搜索组织内成员
+     *
+     * @param oid      组织id
+     * @param username 用户名关键字
+     * @param position 职位关键字
+     * @return 匹配的成员列表
+     */
+    public List<AccountVO> getAccountsByUsernameAndPosition(Long oid, String username, String position) {
+        return registrationRepository.findByOrganizationIdAndStateAndAccountUsernameContainingAndPositionContaining(oid, 1, username, position).stream()
+                .map(this::toAccountVO)
+                .toList();
+    }
+
+    /**
+     * 将 Registration 转换为 AccountVO
+     */
+    private AccountVO toAccountVO(Registration reg) {
+        Account account = reg.getAccount();
+        AccountVO vo = account.asViewObject(AccountVO.class);
+        vo.setPosition(reg.getPosition());  // position 从 Registration 获取
+        return vo;
     }
 
     /**
