@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
+import ynu.edu.pims.dto.request.CreateRO;
 import ynu.edu.pims.dto.request.ReplyRO;
 import ynu.edu.pims.dto.request.ApplyRO;
 import ynu.edu.pims.entity.RestBean;
@@ -46,5 +47,23 @@ public class OrganizationController {
     @PostMapping("/admin/reject-to-joint-organization")
     public RestBean<String> rejectToJoinOrganization(ReplyRO ro) {
         return RestBean.success(organizationService.rejectToJoinOrganization(ro));
+    }
+
+    @Operation(summary = "用户申请创建组织", description = "用户申请创建组织")
+    @PostMapping("/user/apply-to-create-organization")
+    public RestBean<String> applyToCreateOrganization(CreateRO ro) {
+        return RestBean.success(organizationService.applyToCreateOrganization(ro));
+    }
+
+    @Operation(summary = "同意用户创建组织", description = "同意用户创建组织")
+    @PostMapping("/superadmin/agree-to-create-organization")
+    public RestBean<String> agreeToCreateOrganization(@RequestParam Long oid) {
+        return RestBean.success(organizationService.agreeToCreateOrganization(oid));
+    }
+
+    @Operation(summary = "拒绝用户创建组织", description = "拒绝用户创建组织")
+    @PostMapping("/superadmin/reject-to-create-organization")
+    public RestBean<String> rejectToCreateOrganization(@RequestParam Long oid) {
+        return RestBean.success(organizationService.rejectToCreateOrganization(oid));
     }
 }

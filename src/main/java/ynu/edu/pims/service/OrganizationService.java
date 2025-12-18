@@ -7,6 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import ynu.edu.pims.dto.request.ApplyRO;
+import ynu.edu.pims.dto.request.CreateRO;
 import ynu.edu.pims.dto.request.ReplyRO;
 import ynu.edu.pims.entity.Account;
 import ynu.edu.pims.entity.Organization;
@@ -15,6 +16,8 @@ import ynu.edu.pims.entity.Role;
 import ynu.edu.pims.repository.AccountRepository;
 import ynu.edu.pims.repository.OrganizationRepository;
 import ynu.edu.pims.repository.RegistrationRepository;
+import ynu.edu.pims.repository.RoleRepository;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -30,6 +33,88 @@ public class OrganizationService {
 
     @Resource
     private RegistrationRepository registrationRepository;
+
+    @Resource
+    private RoleRepository roleRepository;
+
+    /**
+     * 用户申请创建组织
+     *
+     * @param ro 包含组织信息和申请者id的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String applyToCreateOrganization(CreateRO ro) {
+        // 检查用户是否存在
+        Account account = accountRepository.findById(ro.getAid()).orElse(null);
+        if (account == null) {
+            return "用户不存在";
+        }
+        // 创建组织申请记录（反射复制同名字段：name, description, logo, banner, reason）
+        Organization org = ro.asViewObject(Organization.class, o -> {
+            o.setState(0);  // 待审核
+            o.setAccount(account);
+        });
+        organizationRepository.save(org);
+        return null;
+    }
+
+    /**
+     * 超级管理员同意创建组织申请
+     *
+     * @param oid 组织id
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    @Transactional
+    public String agreeToCreateOrganization(Long oid) {
+        // 1. 查询组织并更新状态
+        Organization org = organizationRepository.findById(oid).orElse(null);
+        if (org == null) {
+            return "组织不存在";
+        }
+        if (org.getState() != 0) {
+            return "该申请已被处理";
+        }
+        org.setState(1);  // 通过
+        organizationRepository.save(org);
+
+        // 2. 获取创建者并添加 Registration 记录
+        Account account = org.getAccount();
+        Registration registration = new Registration();
+        registration.setAccount(account);
+        registration.setOrganization(org);
+        registration.setState(1);  // 已通过
+        registration.setPosition("boss");
+        registrationRepository.save(registration);
+
+        // 3. 修改用户角色：从 user 改为 admin
+        Role userRole = roleRepository.findByRolename("user").orElse(null);
+        Role adminRole = roleRepository.findByRolename("admin").orElse(null);
+        if (userRole != null && adminRole != null) {
+            account.getRoles().remove(userRole);
+            account.getRoles().add(adminRole);
+            accountRepository.save(account);
+        }
+        return null;
+    }
+
+    /**
+     * 超级管理员拒绝创建组织申请
+     *
+     * @param oid 组织id
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String rejectToCreateOrganization(Long oid) {
+        Organization org = organizationRepository.findById(oid).orElse(null);
+        if (org == null) {
+            return "组织不存在";
+        }
+        if (org.getState() != 0) {
+            return "该申请已被处理";
+        }
+        org.setState(2);  // 拒绝
+        organizationRepository.save(org);
+        return null;
+    }
 
     /**
      * 老板同意用户加入组织
