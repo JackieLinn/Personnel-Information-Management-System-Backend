@@ -6,6 +6,8 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import ynu.edu.pims.dto.request.ApplyRO;
+import ynu.edu.pims.dto.request.ReplyRO;
 import ynu.edu.pims.entity.Account;
 import ynu.edu.pims.entity.Organization;
 import ynu.edu.pims.entity.Registration;
@@ -13,6 +15,8 @@ import ynu.edu.pims.entity.Role;
 import ynu.edu.pims.repository.AccountRepository;
 import ynu.edu.pims.repository.OrganizationRepository;
 import ynu.edu.pims.repository.RegistrationRepository;
+
+import java.util.List;
 
 @Service
 @DependsOn("accountService")
@@ -26,6 +30,85 @@ public class OrganizationService {
 
     @Resource
     private RegistrationRepository registrationRepository;
+
+    /**
+     * 老板同意用户加入组织
+     *
+     * @param ro 包含老板id和申请记录id的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String agreeToJoinOrganization(ReplyRO ro) {
+        return handleJoinApplication(ro, 1);
+    }
+
+    /**
+     * 老板拒绝用户加入组织
+     *
+     * @param ro 包含老板id和申请记录id的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String rejectToJoinOrganization(ReplyRO ro) {
+        return handleJoinApplication(ro, 2);
+    }
+
+    /**
+     * 处理加入组织的申请
+     *
+     * @param ro    请求对象
+     * @param state 目标状态（1=同意，2=拒绝）
+     * @return 操作结果
+     */
+    private String handleJoinApplication(ReplyRO ro, Integer state) {
+        // 查询申请记录
+        Registration registration = registrationRepository.findById(ro.getRegId()).orElse(null);
+        if (registration == null) {
+            return "申请记录不存在";
+        }
+        // 检查申请是否为待审核状态
+        if (registration.getState() != 0) {
+            return "该申请已被处理";
+        }
+        // 验证操作者是否是该组织的创建者（老板）
+        Long oid = registration.getOrganization().getId();
+        if (!organizationRepository.existsByIdAndAccountId(oid, ro.getBossId())) {
+            return "您不是该组织的管理员，无权审核";
+        }
+        // 更新状态
+        registration.setState(state);
+        registrationRepository.save(registration);
+        return null;
+    }
+
+    /**
+     * 用户申请加入组织
+     *
+     * @param ro 包含用户id和组织id的请求对象
+     * @return 操作结果，null表示成功，否则为失败原因
+     */
+    public String applyToJoinOrganization(ApplyRO ro) {
+        // 检查组织是否存在
+        if (!organizationRepository.existsById(ro.getOid())) {
+            return "组织不存在";
+        }
+        // 检查是否已经有申请记录
+        if (registrationRepository.existsByAccountIdAndOrganizationIdAndStateIn(ro.getAid(), ro.getOid(), List.of(0, 1))) {
+            return "您已申请或已在该组织中";
+        }
+        // 创建申请记录
+        Account account = accountRepository.findById(ro.getAid()).orElse(null);
+        Organization org = organizationRepository.findById(ro.getOid()).orElse(null);
+        if (account == null || org == null) {
+            return "用户或组织不存在";
+        }
+        Registration registration = ro.asViewObject(Registration.class, reg -> {
+            reg.setAccount(account);
+            reg.setOrganization(org);
+            reg.setState(0);  // 待审核
+            reg.setPosition("pending");  // 待定职位
+        });
+        registrationRepository.save(registration);
+        return null;
+    }
 
     /**
      * 根据用户id查询其创建的组织id（即判断是否为boss）

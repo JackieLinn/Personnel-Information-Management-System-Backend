@@ -14,6 +14,9 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     
     Optional<Registration> findByAccountIdAndOrganizationIdAndState(Long aid, Long oid, Integer state);
     
+    // 检查是否存在待审核或已通过的记录
+    boolean existsByAccountIdAndOrganizationIdAndStateIn(Long aid, Long oid, List<Integer> states);
+    
     // 查询组织内所有已通过的成员
     List<Registration> findByOrganizationIdAndState(Long oid, Integer state);
     
@@ -27,4 +30,3 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     List<Registration> findByOrganizationIdAndStateAndAccountUsernameContainingAndPositionContaining(
             Long oid, Integer state, String username, String position);
 }
-

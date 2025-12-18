@@ -3,10 +3,9 @@ package ynu.edu.pims.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ynu.edu.pims.dto.request.ReplyRO;
+import ynu.edu.pims.dto.request.ApplyRO;
 import ynu.edu.pims.entity.RestBean;
 import ynu.edu.pims.service.OrganizationService;
 
@@ -29,5 +28,23 @@ public class OrganizationController {
     public RestBean<Long> getOrganizationInformation(@RequestParam Long oid) {
         // TODO:
         return RestBean.success();
+    }
+
+    @Operation(summary = "用户申请加入组织", description = "用户申请加入组织")
+    @PostMapping("/user/apply-to-joint-organization")
+    public RestBean<String> applyToJoinOrganization(ApplyRO ro) {
+        return RestBean.success(organizationService.applyToJoinOrganization(ro));
+    }
+
+    @Operation(summary = "同意用户加入组织", description = "同意用户加入组织")
+    @PostMapping("/admin/agree-to-joint-organization")
+    public RestBean<String> agreeToJoinOrganization(ReplyRO ro) {
+        return RestBean.success(organizationService.agreeToJoinOrganization(ro));
+    }
+
+    @Operation(summary = "拒绝用户加入组织", description = "拒绝用户加入组织")
+    @PostMapping("/admin/reject-to-joint-organization")
+    public RestBean<String> rejectToJoinOrganization(ReplyRO ro) {
+        return RestBean.success(organizationService.rejectToJoinOrganization(ro));
     }
 }
