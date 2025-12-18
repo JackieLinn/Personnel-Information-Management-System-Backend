@@ -20,6 +20,9 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.roles WHERE a.username = :text OR a.email = :text")
     Optional<Account> findByUsernameOrEmailWithRoles(@Param("text") String text);
     
+    @Query("SELECT a FROM Account a LEFT JOIN FETCH a.roles WHERE a.id = :id")
+    Optional<Account> findByIdWithRoles(@Param("id") Long id);
+    
     boolean existsByPhoneAndIdNot(String phone, Long id);
     
     boolean existsByPhone(String phone);
