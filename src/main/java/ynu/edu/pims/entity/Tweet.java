@@ -3,6 +3,8 @@ package ynu.edu.pims.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Table(name = "tweet")
@@ -17,4 +19,7 @@ public class Tweet implements BaseData {
     @Lob    // 长文本
     @Column(nullable = false, name = "content")
     private String content;
+
+    @Column(nullable = false, name = "create_time")
+    private LocalDateTime createTime;
 }
