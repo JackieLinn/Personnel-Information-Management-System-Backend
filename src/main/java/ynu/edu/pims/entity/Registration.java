@@ -27,4 +27,7 @@ public class Registration implements BaseData {
 
     @Column(nullable = false, name = "state")
     private Integer state;  // 0: 待审核; 1: 通过; 2: 拒绝; 3: 删除
+
+    @Column(nullable = false, name = "position")
+    private String position;  // 用户在该组织中的职位
 }

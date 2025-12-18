@@ -65,6 +65,7 @@ public class OrganizationService {
         registration.setAccount(admin);
         registration.setOrganization(org);
         registration.setState(1);  // 创建者直接通过
+        registration.setPosition("boss");  // 创建者默认职位为 boss
         registrationRepository.save(registration);
     }
 }

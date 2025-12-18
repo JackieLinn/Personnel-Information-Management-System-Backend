@@ -41,7 +41,7 @@ public class AccountController {
 
     @Operation(summary = "老板将用户移出组织", description = "老板将用户移出组织")
     @PostMapping("/admin/remove-account-out-organization")
-    public RestBean<String> addAccountOutOrganization(OutRO ro) {
-        return RestBean.success(accountService.addAccountOutOrganization(ro));
+    public RestBean<String> removeAccountOutOrganization(OutRO ro) {
+        return RestBean.success(accountService.removeAccountOutOrganization(ro));
     }
 }

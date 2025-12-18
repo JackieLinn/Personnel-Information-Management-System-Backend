@@ -35,9 +35,6 @@ public class Account implements BaseData {
     @Column(nullable = false, name = "phone")
     private String phone;
 
-    @Column(name = "position")
-    private String position;
-
     @Column(name = "address")
     private String address;
 

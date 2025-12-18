@@ -77,7 +77,6 @@ public class AccountService implements UserDetailsService {
             Account original = accountOpt.get();
             acc.setPassword(original.getPassword());
             acc.setEmail(original.getEmail());
-            acc.setPosition(original.getPosition());
             acc.setRoles(original.getRoles());
         });
         accountRepository.save(account);
@@ -95,18 +94,15 @@ public class AccountService implements UserDetailsService {
         if (!organizationRepository.existsByIdAndAccountId(ro.getOid(), ro.getBossId())) {
             return "您不是该组织的管理员，无权修改";
         }
-        // 检查被修改员工是否在该组织中（已通过审核）
-        if (!registrationRepository.existsByAccountIdAndOrganizationIdAndState(ro.getEmployeeId(), ro.getOid(), 1)) {
+        // 查找员工在该组织中的注册记录
+        Optional<Registration> regOpt = registrationRepository.findByAccountIdAndOrganizationIdAndState(ro.getEmployeeId(), ro.getOid(), 1);
+        if (regOpt.isEmpty()) {
             return "该员工不在您的组织中";
         }
-        // 修改员工职位
-        Optional<Account> accountOpt = accountRepository.findById(ro.getEmployeeId());
-        if (accountOpt.isEmpty()) {
-            return "员工不存在";
-        }
-        Account employee = accountOpt.get();
-        employee.setPosition(ro.getPosition());
-        accountRepository.save(employee);
+        // 修改员工在该组织的职位
+        Registration registration = regOpt.get();
+        registration.setPosition(ro.getPosition());
+        registrationRepository.save(registration);
         return null;
     }
 
@@ -145,6 +141,7 @@ public class AccountService implements UserDetailsService {
             registration.setAccount(account);
             registration.setOrganization(org);
             registration.setState(1);
+            registration.setPosition(ro.getPosition());
             registrationRepository.save(registration);
         }
         return null;
@@ -156,7 +153,7 @@ public class AccountService implements UserDetailsService {
      * @param ro 包含组织id、老板id和用户id的请求对象
      * @return 操作结果，null表示成功，否则为失败原因
      */
-    public String addAccountOutOrganization(OutRO ro) {
+    public String removeAccountOutOrganization(OutRO ro) {
         // 检查操作者是否是该组织的老板
         if (!organizationRepository.existsByIdAndAccountId(ro.getOid(), ro.getBossId())) {
             return "您不是该组织的管理员，无权操作";
@@ -169,14 +166,8 @@ public class AccountService implements UserDetailsService {
         // 修改 registration 状态为 3（删除）
         Registration registration = regOpt.get();
         registration.setState(3);
+        registration.setPosition("OUT");
         registrationRepository.save(registration);
-        // 修改用户 position 为 null
-        Optional<Account> accountOpt = accountRepository.findById(ro.getAid());
-        if (accountOpt.isPresent()) {
-            Account account = accountOpt.get();
-            account.setPosition(null);
-            accountRepository.save(account);
-        }
         return null;
     }
 
@@ -187,20 +178,20 @@ public class AccountService implements UserDetailsService {
     @Order(2)
     public void initAccount() {
         if (accountRepository.count() == 0) {
-            createAccount("superadmin", "123456@qq.com", "13888888888", "superadmin",
+            createAccount("superadmin", "123456@qq.com", "13888888888",
                     LocalDate.of(1900, 1, 1), "https://avatars.githubusercontent.com/u/136216354?s=96&v=4", "superadmin");
-            createAccount("JackieLinn", "23456@qq.com", "13111111111", "boss",
+            createAccount("JackieLinn", "23456@qq.com", "13111111111",
                     LocalDate.of(2004, 1, 1), "https://avatars.githubusercontent.com/u/136216354?s=96&v=4", "admin");
-            createAccount("KrowFeather", "345678@qq.com", "13222222222", "boss",
+            createAccount("KrowFeather", "345678@qq.com", "13222222222",
                     LocalDate.of(2004, 2, 2), "https://avatars.githubusercontent.com/u/38802245?v=4", "admin");
-            createAccount("01-Dreamer", "456789@qq.com", "13333333333", "boss",
+            createAccount("01-Dreamer", "456789@qq.com", "13333333333",
                     LocalDate.of(2005, 1, 1), "https://avatars.githubusercontent.com/u/148927117?v=4", "admin");
-            createAccount("test1", "1234567@qq.com", "13444444444", "user",
+            createAccount("test1", "1234567@qq.com", "13444444444",
                     LocalDate.of(1995, 1, 1), "https://avatars.githubusercontent.com/u/181219839?v=4", "user");
         }
     }
 
-    private void createAccount(String username, String email, String phone, String position,
+    private void createAccount(String username, String email, String phone,
                                LocalDate birthday, String avatar, String roleName) {
         Account account = new Account();
         account.setUsername(username);
@@ -208,7 +199,6 @@ public class AccountService implements UserDetailsService {
         account.setEmail(email);
         account.setSex(0);
         account.setPhone(phone);
-        account.setPosition(position);
         account.setAddress("China");
         account.setBirthday(birthday);
         account.setAvatar(avatar);

@@ -9,8 +9,8 @@ import java.util.Optional;
 @Repository
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
     
-    boolean existsByAccountIdAndOrganizationIdAndState(Long aid, Long oid, Integer state);
-    
     Optional<Registration> findByAccountIdAndOrganizationId(Long aid, Long oid);
+    
+    Optional<Registration> findByAccountIdAndOrganizationIdAndState(Long aid, Long oid, Integer state);
 }
 
