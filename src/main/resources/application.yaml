@@ -2,10 +2,22 @@ server:
   port: 8088
 
 spring:
+  docker:
+    compose:
+      enabled: false
+  data:
+    redis:
+      host: 110.41.166.11
+      port: 6379
+      password: 20230607
+      database: 0
+      lettuce:
+        pool:
+          max-active: 8
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/pims_springboot3?useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: '12345678'
+    url: jdbc:mysql://110.41.166.11:3306/bcnl?useSSL=false&allowPublicKeyRetrieval=true
+    username: failedman
+    password: 20230607
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -25,16 +37,13 @@ spring:
     username: linxy20040304@163.com
     password: PXILBFPDDKSNRFAI
   rabbitmq:
-    addresses: localhost
-    username: root
-    password: 12345678
+    addresses: 110.41.166.11:5672
+    username: failedman
+    password: 20230607
     virtual-host: /
 
-knife4j:
-  enable: true
-  setting:
-    language: zh_cn
-  basic:
-    enable: true
-    username: root
-    password: 12345678
+springdoc:
+  swagger-ui:
+    path: /doc/ui
+  api-docs:
+    path: /doc/json
