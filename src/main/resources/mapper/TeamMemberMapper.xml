@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="zxylearn.bcnlserver.mapper.TeamMemberMapper">
+<mapper namespace="ynu.edu.pims.mapper.TeamMemberMapper">
 
-    <resultMap id="TeamMemberVOMap" type="zxylearn.bcnlserver.pojo.DTO.TeamMemberVO">
+    <resultMap id="TeamMemberVOMap" type="ynu.edu.pims.pojo.DTO.TeamMemberVO">
         <result property="position" column="position"/>
         <result property="joinTime" column="join_time"/>
-        <association property="user" javaType="zxylearn.bcnlserver.pojo.entity.User">
+        <association property="user" javaType="ynu.edu.pims.pojo.entity.User">
             <id property="id" column="u_id"/>
             <result property="username" column="u_username"/>
             <result property="email" column="u_email"/>
