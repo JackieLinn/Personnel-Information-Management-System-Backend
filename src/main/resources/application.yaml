@@ -1,49 +1,78 @@
-server:
-  port: 8088
-
 spring:
-  docker:
-    compose:
-      enabled: false
+  application:
+    name: bcnlserver
+
+  datasource:
+    url: jdbc:mysql://110.41.166.11:3306/bcnl?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: failedman
+    password: 20230607
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   data:
     redis:
       host: 110.41.166.11
       port: 6379
       password: 20230607
-      database: 0
+      database: 2
       lettuce:
         pool:
           max-active: 8
-  datasource:
-    url: jdbc:mysql://110.41.166.11:3306/bcnl?useSSL=false&allowPublicKeyRetrieval=true
-    username: failedman
-    password: 20230607
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-  security:
-    filter:
-      order: -100
-    jwt:
-      key: abcdefghijk
-      expire: 7
-  mail:
-    host: smtp.163.com
-    username: linxy20040304@163.com
-    password: PXILBFPDDKSNRFAI
-  rabbitmq:
-    addresses: 110.41.166.11:5672
-    username: failedman
-    password: 20230607
-    virtual-host: /
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1
 
-springdoc:
-  swagger-ui:
-    path: /doc/ui
-  api-docs:
-    path: /doc/json
+  elasticsearch:
+    uris: http://110.41.166.11:9200
+    username: elastic
+    password: 20230607
+    connection-timeout: 10000
+    read-timeout: 10000
+
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 2711339704@qq.com
+    password: xlvahvcmradrdhfg
+    protocol: smtp
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: true
+
+server:
+  port: 19090
+  worker-id: 1
+  datacenter-id: 1
+
+aliyun:
+  oss:
+    endpoint: oss-cn-chengdu.aliyuncs.com
+    accessKeyId: secret
+    accessKeySecret: secret
+    bucketName: zxydata
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - [%highlight(%level)] : %msg%n"
+
+jwt:
+  secret: vwAP+ytWuNgZqE0VTIzAwauDRB/CQqkMxWxBaVDYbAViVTxthUJwEA+Qu5VZXG870P/AjyZMXwp6mSksYwn9Ag==zxylearn
+  token-expiration: 604800000
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: zxylearn.bcnlserver.pojo.entity,zxylearn.bcnlserver.pojo.DTO
+
+knife4j:
+  enable: true
+  setting:
+    language: zh-cn
+  basic:
+    enable: true
+    username: failedman
+    password: 20230607
