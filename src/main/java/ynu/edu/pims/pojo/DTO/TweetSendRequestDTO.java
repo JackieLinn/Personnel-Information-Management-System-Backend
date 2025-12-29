@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.pojo.DTO;
+package ynu.edu.pims.pojo.DTO;
 
 import java.util.List;
 

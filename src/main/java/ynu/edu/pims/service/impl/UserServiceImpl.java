@@ -3,10 +3,10 @@ package ynu.edu.pims.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import zxylearn.bcnlserver.mapper.UserMapper;
-import zxylearn.bcnlserver.pojo.DTO.UserSearchRequestDTO;
-import zxylearn.bcnlserver.pojo.entity.User;
-import zxylearn.bcnlserver.service.UserService;
+import ynu.edu.pims.mapper.UserMapper;
+import ynu.edu.pims.pojo.DTO.UserSearchRequestDTO;
+import ynu.edu.pims.pojo.entity.User;
+import ynu.edu.pims.service.UserService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,7 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<User> searchUserList(UserSearchRequestDTO userSearchRequestDTO) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        
+
         LocalDate now = LocalDate.now();
         if (userSearchRequestDTO.getMinAge() != null) {
             wrapper.le(User::getBirthday, now.minusYears(userSearchRequestDTO.getMinAge()));
@@ -60,40 +60,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         boolean hasCriteria = userSearchRequestDTO.getId() != null ||
-                              userSearchRequestDTO.getUsername() != null ||
-                              userSearchRequestDTO.getEmail() != null ||
-                              userSearchRequestDTO.getName() != null ||
-                              userSearchRequestDTO.getPrefixName() != null ||
-                              userSearchRequestDTO.getSuffixName() != null ||
-                              userSearchRequestDTO.getPhone() != null ||
-                              userSearchRequestDTO.getGender() != null ||
-                              userSearchRequestDTO.getAddress() != null ||
-                              userSearchRequestDTO.getAdmin() != null;
+                userSearchRequestDTO.getUsername() != null ||
+                userSearchRequestDTO.getEmail() != null ||
+                userSearchRequestDTO.getName() != null ||
+                userSearchRequestDTO.getPrefixName() != null ||
+                userSearchRequestDTO.getSuffixName() != null ||
+                userSearchRequestDTO.getPhone() != null ||
+                userSearchRequestDTO.getGender() != null ||
+                userSearchRequestDTO.getAddress() != null ||
+                userSearchRequestDTO.getAdmin() != null;
 
         if (hasCriteria) {
             if (userSearchRequestDTO.getMatchAll()) {
                 wrapper.eq(userSearchRequestDTO.getId() != null, User::getId, userSearchRequestDTO.getId())
-                       .eq(userSearchRequestDTO.getUsername() != null, User::getUsername, userSearchRequestDTO.getUsername())
-                       .eq(userSearchRequestDTO.getEmail() != null, User::getEmail, userSearchRequestDTO.getEmail())
-                       .like(userSearchRequestDTO.getName() != null, User::getName, userSearchRequestDTO.getName())
-                       .likeRight(userSearchRequestDTO.getPrefixName() != null, User::getName, userSearchRequestDTO.getPrefixName())
-                       .likeLeft(userSearchRequestDTO.getSuffixName() != null, User::getName, userSearchRequestDTO.getSuffixName())
-                       .like(userSearchRequestDTO.getPhone() != null, User::getPhone, userSearchRequestDTO.getPhone())
-                       .eq(userSearchRequestDTO.getGender() != null, User::getGender, userSearchRequestDTO.getGender())
-                       .like(userSearchRequestDTO.getAddress() != null, User::getAddress, userSearchRequestDTO.getAddress())
-                       .eq(userSearchRequestDTO.getAdmin() != null, User::getAdmin, userSearchRequestDTO.getAdmin());
+                        .eq(userSearchRequestDTO.getUsername() != null, User::getUsername, userSearchRequestDTO.getUsername())
+                        .eq(userSearchRequestDTO.getEmail() != null, User::getEmail, userSearchRequestDTO.getEmail())
+                        .like(userSearchRequestDTO.getName() != null, User::getName, userSearchRequestDTO.getName())
+                        .likeRight(userSearchRequestDTO.getPrefixName() != null, User::getName, userSearchRequestDTO.getPrefixName())
+                        .likeLeft(userSearchRequestDTO.getSuffixName() != null, User::getName, userSearchRequestDTO.getSuffixName())
+                        .like(userSearchRequestDTO.getPhone() != null, User::getPhone, userSearchRequestDTO.getPhone())
+                        .eq(userSearchRequestDTO.getGender() != null, User::getGender, userSearchRequestDTO.getGender())
+                        .like(userSearchRequestDTO.getAddress() != null, User::getAddress, userSearchRequestDTO.getAddress())
+                        .eq(userSearchRequestDTO.getAdmin() != null, User::getAdmin, userSearchRequestDTO.getAdmin());
             } else {
                 wrapper.and(w -> w
-                       .or(userSearchRequestDTO.getId() != null, i -> i.eq(User::getId, userSearchRequestDTO.getId()))
-                       .or(userSearchRequestDTO.getUsername() != null, i -> i.eq(User::getUsername, userSearchRequestDTO.getUsername()))
-                       .or(userSearchRequestDTO.getEmail() != null, i -> i.eq(User::getEmail, userSearchRequestDTO.getEmail()))
-                       .or(userSearchRequestDTO.getName() != null, i -> i.like(User::getName, userSearchRequestDTO.getName()))
-                       .or(userSearchRequestDTO.getPrefixName() != null, i -> i.likeRight(User::getName, userSearchRequestDTO.getPrefixName()))
-                       .or(userSearchRequestDTO.getSuffixName() != null, i -> i.likeLeft(User::getName, userSearchRequestDTO.getSuffixName()))
-                       .or(userSearchRequestDTO.getPhone() != null, i -> i.like(User::getPhone, userSearchRequestDTO.getPhone()))
-                       .or(userSearchRequestDTO.getGender() != null, i -> i.eq(User::getGender, userSearchRequestDTO.getGender()))
-                       .or(userSearchRequestDTO.getAddress() != null, i -> i.like(User::getAddress, userSearchRequestDTO.getAddress()))
-                       .or(userSearchRequestDTO.getAdmin() != null, i -> i.eq(User::getAdmin, userSearchRequestDTO.getAdmin()))
+                        .or(userSearchRequestDTO.getId() != null, i -> i.eq(User::getId, userSearchRequestDTO.getId()))
+                        .or(userSearchRequestDTO.getUsername() != null, i -> i.eq(User::getUsername, userSearchRequestDTO.getUsername()))
+                        .or(userSearchRequestDTO.getEmail() != null, i -> i.eq(User::getEmail, userSearchRequestDTO.getEmail()))
+                        .or(userSearchRequestDTO.getName() != null, i -> i.like(User::getName, userSearchRequestDTO.getName()))
+                        .or(userSearchRequestDTO.getPrefixName() != null, i -> i.likeRight(User::getName, userSearchRequestDTO.getPrefixName()))
+                        .or(userSearchRequestDTO.getSuffixName() != null, i -> i.likeLeft(User::getName, userSearchRequestDTO.getSuffixName()))
+                        .or(userSearchRequestDTO.getPhone() != null, i -> i.like(User::getPhone, userSearchRequestDTO.getPhone()))
+                        .or(userSearchRequestDTO.getGender() != null, i -> i.eq(User::getGender, userSearchRequestDTO.getGender()))
+                        .or(userSearchRequestDTO.getAddress() != null, i -> i.like(User::getAddress, userSearchRequestDTO.getAddress()))
+                        .or(userSearchRequestDTO.getAdmin() != null, i -> i.eq(User::getAdmin, userSearchRequestDTO.getAdmin()))
                 );
             }
         }

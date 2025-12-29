@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.controller;
+package ynu.edu.pims.controller;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import zxylearn.bcnlserver.OSS.OssService;
+import ynu.edu.pims.OSS.OssService;
 
 @Tag(name = "文件模块")
 @RestController

@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.controller;
+package ynu.edu.pims.controller;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import zxylearn.bcnlserver.ES.TweetDocService;
-import zxylearn.bcnlserver.OSS.OssService;
-import zxylearn.bcnlserver.common.UserContext;
-import zxylearn.bcnlserver.hutool.IdGeneratorService;
-import zxylearn.bcnlserver.pojo.DTO.TweetSendRequestDTO;
-import zxylearn.bcnlserver.pojo.document.TweetDoc;
-import zxylearn.bcnlserver.pojo.entity.Team;
-import zxylearn.bcnlserver.service.TeamMemberService;
-import zxylearn.bcnlserver.service.TeamService;
-import zxylearn.bcnlserver.utils.JwtUtil;
+import ynu.edu.pims.ES.TweetDocService;
+import ynu.edu.pims.OSS.OssService;
+import ynu.edu.pims.common.UserContext;
+import ynu.edu.pims.hutool.IdGeneratorService;
+import ynu.edu.pims.pojo.DTO.TweetSendRequestDTO;
+import ynu.edu.pims.pojo.document.TweetDoc;
+import ynu.edu.pims.pojo.entity.Team;
+import ynu.edu.pims.service.TeamMemberService;
+import ynu.edu.pims.service.TeamService;
+import ynu.edu.pims.utils.JwtUtil;
 
 @Tag(name = "推文模块")
 @RestController
@@ -53,12 +53,12 @@ public class TweetController {
         String role = UserContext.getUserRole();
 
         // 判断推文发送合法性
-        if(role.equals(JwtUtil.USER) && teamMemberService.getTeamMember(tweetSendRequestDTO.getTeamId(), userId) == null) {
+        if (role.equals(JwtUtil.USER) && teamMemberService.getTeamMember(tweetSendRequestDTO.getTeamId(), userId) == null) {
             return ResponseEntity.status(403).body(Map.of("error", "无权限操作"));
         }
 
         // 管理员插入判断团队是否存在
-        if(role.equals(JwtUtil.ADMIN) && teamService.getById(tweetSendRequestDTO.getTeamId()) == null) {
+        if (role.equals(JwtUtil.ADMIN) && teamService.getById(tweetSendRequestDTO.getTeamId()) == null) {
             return ResponseEntity.status(404).body(Map.of("error", "团队不存在"));
         }
 
@@ -72,7 +72,7 @@ public class TweetController {
                 .content(tweetSendRequestDTO.getContent())
                 .images(tweetSendRequestDTO.getImages())
                 .build();
-        if(!tweetDocService.createTweet(tweetDoc)) {
+        if (!tweetDocService.createTweet(tweetDoc)) {
             return ResponseEntity.status(500).body(Map.of("error", "推文发送失败"));
         }
 
@@ -90,21 +90,21 @@ public class TweetController {
 
         // 判断推文删除合法性
         TweetDoc tweetDoc = tweetDocService.getTweetById(tweetId);
-        if(tweetDoc == null) {
+        if (tweetDoc == null) {
             return ResponseEntity.status(404).body(Map.of("error", "推文不存在"));
         }
         Team team = teamService.getById(tweetDoc.getTeamId());
-        if(role.equals(JwtUtil.USER) && !tweetDoc.getSenderId().equals(userId) && !team.getOwnerId().equals(userId)) {
+        if (role.equals(JwtUtil.USER) && !tweetDoc.getSenderId().equals(userId) && !team.getOwnerId().equals(userId)) {
             return ResponseEntity.status(403).body(Map.of("error", "无权限操作"));
         }
 
         // 删除推文
-        if(!tweetDocService.removeTweet(tweetId)) {
+        if (!tweetDocService.removeTweet(tweetId)) {
             return ResponseEntity.status(500).body(Map.of("error", "推文删除失败"));
         }
 
         // 删除OSS图片
-        for(String imageUrl: tweetDoc.getImages()) {
+        for (String imageUrl : tweetDoc.getImages()) {
             ossService.deleteFile(imageUrl);
         }
 
@@ -114,8 +114,8 @@ public class TweetController {
     @Operation(summary = "查询推文")
     @GetMapping("/search")
     public ResponseEntity<?> searchTweet(
-        @RequestParam(required = false) String keyword,
-        @RequestParam(required = false) Long teamId) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long teamId) {
 
         return ResponseEntity.ok(Map.of("tweetList", tweetDocService.searchTweet(keyword, teamId)));
     }

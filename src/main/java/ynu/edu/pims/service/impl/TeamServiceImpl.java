@@ -2,9 +2,9 @@ package ynu.edu.pims.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import zxylearn.bcnlserver.mapper.TeamMapper;
-import zxylearn.bcnlserver.pojo.entity.Team;
-import zxylearn.bcnlserver.service.TeamService;
+import ynu.edu.pims.mapper.TeamMapper;
+import ynu.edu.pims.pojo.entity.Team;
+import ynu.edu.pims.service.TeamService;
 
 import java.util.List;
 

@@ -6,12 +6,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import zxylearn.bcnlserver.common.UserContext;
-import zxylearn.bcnlserver.pojo.DTO.UserSearchRequestDTO;
-import zxylearn.bcnlserver.pojo.DTO.UserUpdateRequestDTO;
-import zxylearn.bcnlserver.pojo.entity.User;
-import zxylearn.bcnlserver.service.UserService;
-import zxylearn.bcnlserver.utils.JwtUtil;
+import ynu.edu.pims.common.UserContext;
+import ynu.edu.pims.pojo.DTO.UserSearchRequestDTO;
+import ynu.edu.pims.pojo.DTO.UserUpdateRequestDTO;
+import ynu.edu.pims.pojo.entity.User;
+import ynu.edu.pims.service.UserService;
+import ynu.edu.pims.utils.JwtUtil;
 
 import java.util.Map;
 
@@ -30,18 +30,18 @@ public class UserController {
         Long userId = Long.parseLong(UserContext.getUserId());
         String role = UserContext.getUserRole();
 
-        if(role.equals(JwtUtil.USER) && !userId.equals(userUpdateRequestDTO.getUserId())) {
+        if (role.equals(JwtUtil.USER) && !userId.equals(userUpdateRequestDTO.getUserId())) {
             return ResponseEntity.status(403).body(Map.of("error", "无权限操作"));
         }
 
         // 获取用户
         User user = userService.getById(userId);
-        if(user == null) {
+        if (user == null) {
             return ResponseEntity.status(404).body(Map.of("error", "用户不存在"));
         }
 
         // 验证信息合法性
-        if(userUpdateRequestDTO.getGender() < 0 || userUpdateRequestDTO.getGender() > 2) {
+        if (userUpdateRequestDTO.getGender() < 0 || userUpdateRequestDTO.getGender() > 2) {
             return ResponseEntity.badRequest().body(Map.of("error", "性别信息不合法"));
         }
 
@@ -52,7 +52,7 @@ public class UserController {
         user.setPhone(userUpdateRequestDTO.getPhone() != null && !userUpdateRequestDTO.getPhone().isEmpty() ? userUpdateRequestDTO.getPhone() : user.getPhone());
         user.setGender(userUpdateRequestDTO.getGender() != null ? userUpdateRequestDTO.getGender() : user.getGender());
         user.setAddress(userUpdateRequestDTO.getAddress() != null && !userUpdateRequestDTO.getAddress().isEmpty() ? userUpdateRequestDTO.getAddress() : user.getAddress());
-        if(!userService.updateById(user)) {
+        if (!userService.updateById(user)) {
             return ResponseEntity.status(500).body(Map.of("error", "更新用户信息失败"));
         }
 
@@ -63,7 +63,7 @@ public class UserController {
     @GetMapping("get-info")
     public ResponseEntity<?> getUserInfo(@RequestParam Long userId) {
         User user = userService.getById(userId);
-        if(user == null) {
+        if (user == null) {
             return ResponseEntity.status(404).body(Map.of("error", "用户不存在"));
         }
         return ResponseEntity.ok(Map.of("user", user));

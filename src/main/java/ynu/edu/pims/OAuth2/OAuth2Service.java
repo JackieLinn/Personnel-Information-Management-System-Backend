@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.OAuth2;
+package ynu.edu.pims.OAuth2;
 
 import java.util.HashMap;
 import java.util.Map;

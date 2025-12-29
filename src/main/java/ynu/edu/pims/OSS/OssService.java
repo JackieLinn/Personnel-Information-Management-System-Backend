@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.OSS;
+package ynu.edu.pims.OSS;
 
 import org.springframework.stereotype.Service;
 

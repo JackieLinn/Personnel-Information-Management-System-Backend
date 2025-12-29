@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.hutool;
+package ynu.edu.pims.hutool;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;

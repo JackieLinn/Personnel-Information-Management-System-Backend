@@ -1,6 +1,7 @@
 package ynu.edu.pims.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import ynu.edu.pims.pojo.DTO.UserSearchRequestDTO;
 import ynu.edu.pims.pojo.entity.User;
 
 import java.util.List;

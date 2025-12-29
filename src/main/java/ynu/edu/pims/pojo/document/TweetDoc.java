@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.pojo.document;
+package ynu.edu.pims.pojo.document;
 
 import java.time.LocalDateTime;
 import java.util.List;

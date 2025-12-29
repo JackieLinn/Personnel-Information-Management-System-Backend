@@ -9,7 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import ynu.edu.pims.OAuth2.OAuth2Service;
+import ynu.edu.pims.pojo.DTO.ChangePasswordRequestDTO;
+import ynu.edu.pims.pojo.DTO.LoginRequestDTO;
+import ynu.edu.pims.pojo.DTO.LoginYNURequestDTO;
+import ynu.edu.pims.pojo.DTO.RegisterRequestDTO;
+import ynu.edu.pims.pojo.entity.User;
 import ynu.edu.pims.redis.RedisService;
+import ynu.edu.pims.service.UserService;
 import ynu.edu.pims.utils.EmailUtil;
 import ynu.edu.pims.utils.JwtUtil;
 

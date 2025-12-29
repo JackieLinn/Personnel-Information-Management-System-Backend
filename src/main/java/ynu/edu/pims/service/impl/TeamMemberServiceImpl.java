@@ -3,10 +3,10 @@ package ynu.edu.pims.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import zxylearn.bcnlserver.mapper.TeamMemberMapper;
-import zxylearn.bcnlserver.pojo.DTO.TeamMemberVO;
-import zxylearn.bcnlserver.pojo.entity.TeamMember;
-import zxylearn.bcnlserver.service.TeamMemberService;
+import ynu.edu.pims.mapper.TeamMemberMapper;
+import ynu.edu.pims.pojo.DTO.TeamMemberVO;
+import ynu.edu.pims.pojo.entity.TeamMember;
+import ynu.edu.pims.service.TeamMemberService;
 
 import java.util.List;
 

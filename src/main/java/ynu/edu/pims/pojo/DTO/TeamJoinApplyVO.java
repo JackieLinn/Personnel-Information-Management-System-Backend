@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.pojo.DTO;
+package ynu.edu.pims.pojo.DTO;
 
 import java.time.LocalDateTime;
 
@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import zxylearn.bcnlserver.pojo.entity.User;
+import ynu.edu.pims.pojo.entity.User;
 
 @Data
 @AllArgsConstructor

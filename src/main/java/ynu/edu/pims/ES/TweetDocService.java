@@ -1,4 +1,4 @@
-package zxylearn.bcnlserver.ES;
+package ynu.edu.pims.ES;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
-import zxylearn.bcnlserver.pojo.document.TweetDoc;
+import ynu.edu.pims.pojo.document.TweetDoc;
 
 @Service
 public class TweetDocService {

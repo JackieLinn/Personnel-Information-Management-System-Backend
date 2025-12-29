@@ -3,10 +3,10 @@ package ynu.edu.pims.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import zxylearn.bcnlserver.mapper.TeamJoinApplyMapper;
-import zxylearn.bcnlserver.pojo.DTO.TeamJoinApplyVO;
-import zxylearn.bcnlserver.pojo.entity.TeamJoinApply;
-import zxylearn.bcnlserver.service.TeamJoinApplyService;
+import ynu.edu.pims.mapper.TeamJoinApplyMapper;
+import ynu.edu.pims.pojo.DTO.TeamJoinApplyVO;
+import ynu.edu.pims.pojo.entity.TeamJoinApply;
+import ynu.edu.pims.service.TeamJoinApplyService;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class TeamJoinApplyServiceImpl extends ServiceImpl<TeamJoinApplyMapper, T
 
     @Override
     public TeamJoinApply getTeamJoinApply(Long teamId, Long applicantId) {
-        if(teamId == null || applicantId == null) {
+        if (teamId == null || applicantId == null) {
             return null;
         }
         return getOne(new LambdaQueryWrapper<TeamJoinApply>()
